@@ -51,11 +51,15 @@ def ExecuteSQL(SQL_query):
     finally:
         con.close()
 
-def DrawText(font, color, text: str, j = 0, x = 1):
-    lines = text.split('\n')        #AttributeError: 'tuple' object has no attribute 'split'
+def DrawText(font, color, text: str, j = 0, x = 0):
+    lines = text.split('\n')
+    if x == 0:
+        x_dest = 33
+    else:
+        x_dest = 700*x
     for i, line in enumerate(lines):
         consoleText = font.render(line, False, color)
-        screen.blit(consoleText, (33*x, 33 + (j+i)*font.get_height()))
+        screen.blit(consoleText, (x_dest, 33 + (j+i)*font.get_height()))
 
 def DrawTextList(font, color, textList):
     for i, line in enumerate(textList):
@@ -66,7 +70,7 @@ def DrawDBText(font, color, result):
         s = ""
         for x, text in enumerate(line):
             #s += text + "  "
-            DrawText(font, color, s, i)
+            DrawText(font, color, text, i, x)
 
 pygame.init()
 
