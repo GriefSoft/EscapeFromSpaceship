@@ -209,6 +209,7 @@ overlay.fill((0, 0, 0, 200))
 
 running = True
 
+DB_mod = False
 loc = 1
 
 while running:
@@ -219,10 +220,14 @@ while running:
     button = None
     button_dest = None
     button_rect = None
+    redButton = None
+    redButton_dest = None
+    redButton_rect = None
     cat = None
     doorTriggerRect = None
     pc_rect = None
-
+    combination_lock = None
+    combination_lock_opened = False
 
     swithLoc = False
 
@@ -240,6 +245,13 @@ while running:
         button_dest = (1211, 25)
         button_rect = button.get_rect(topleft=button_dest)
 
+
+        redButton = pygame.image.load("Texture\\RedButton_Sprite.png")
+        redButton = pygame.transform.scale_by(redButton, 0.1)
+        redButton_dest = (1211, 60)
+        redButton_rect = redButton.get_rect(topleft=redButton_dest)
+
+
         cat = Cat("Texture\\Cat_Sheet.png", frame_count=7, scale=0.3)
 
         doorTriggerRect = pygame.Rect(1123, 537, 100, 100) #(964, 528)
@@ -252,12 +264,17 @@ while running:
         cat = Cat("Texture\\Cat_Sheet.png", frame_count=7, scale=0.3, x=52, y=851)
         doorTriggerRect = pygame.Rect(2939, 2457, 40, 100)
 
+        combination_lock = pygame.image.load("Texture\\Combination_Lock.png")   #(826, 210)
+        combination_lock = pygame.transform.scale_by(combination_lock, 0.1)
+        combination_lock_dest = (800, 195)
+        combination_lock_rect = combination_lock.get_rect(topleft=combination_lock_dest)
+
     ########
     # Флаг для отслеживания состояния монитора
     monitor_opened = False
     # Масштабированная версия для полного экрана
     pc_fullscreen = None
-
+    combination_lock_fullscreen = None
 
 
     """SELECT 
@@ -296,11 +313,21 @@ while running:
                 # Отрисовываем монитор на весь экран
                 screen.blit(pc_fullscreen, (0, 0))
                 screen.blit(button, button_dest)
+                screen.blit(redButton, redButton_dest)
                 # отрисовка текста
                 if len(SQL_result) == 0:  # Не робит!
                     DrawText(font, (157, 164, 171), SQL_query)
-                else:
+                elif DB_mod == True:
                     DrawDBText(font, (157, 164, 171), SQL_result, roll)
+
+        if combination_lock is not None:
+            if not combination_lock_opened:
+                # Отрисовываем обычный монитор
+                screen.blit(combination_lock, combination_lock_dest)
+            else:
+                screen.blit(overlay, (0, 0))
+                screen.blit(combination_lock_fullscreen, (431, 235)) #(1280, 896)
+
 
 
 
@@ -326,18 +353,28 @@ while running:
                 #swithLoc = True
                 #loc = 2
                 # кнопка
-                if button_rect.collidepoint(event.pos):
-                    SQL_result = ExecuteSQL(SQL_query)
+                if loc == 1:
+                    if button_rect.collidepoint(event.pos):
+                        SQL_result = ExecuteSQL(SQL_query)
+                        DB_mod = True
+                    elif redButton_rect.collidepoint(event.pos):
+                        DB_mod = False
+                        SQL_result = []
+                    # Комп
+                    if pc_rect.collidepoint(event.pos):  # Открываем комп
+                        monitor_opened = not monitor_opened
 
-                # Комп
-                if pc_rect.collidepoint(event.pos):  # Открываем комп
-                    monitor_opened = not monitor_opened
+                        if monitor_opened:
+                            pc_fullscreen = pygame.transform.scale_by(pcTxtur, 9)
+                if loc == 2:
+                    if combination_lock_rect.collidepoint(event.pos):
+                        combination_lock_opened = not combination_lock_opened
+                        print("EEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+                        if combination_lock_opened:
+                            combination_lock_fullscreen = pygame.transform.scale_by(combination_lock, 9)
 
-                    if monitor_opened:
-                        screen_width, screen_height = screen.get_size()  # окно игры
 
-                        print(f"screen_width{screen_width}, screen_height{screen_height}")
-                        pc_fullscreen = pygame.transform.scale_by(pcTxtur, 9)
+
 
                 print(f"Нажата кнопка: {event.button}")  # 1-левая, 3-правая, 2-средняя
                 print(f"Позиция: {event.pos}")  # (x, y)
