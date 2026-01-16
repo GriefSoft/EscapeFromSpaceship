@@ -1,10 +1,9 @@
 import pygame
 import sys
 import sqlite3
-import pgzrun as pg
 
 """Задачи:
-    
+
             Перенос текста +- сколько то пикселей
     2) Перелопатить код
     3) Добавить циферблат для ввода пароля и открытие двери
@@ -12,7 +11,7 @@ import pgzrun as pg
 
 
 class Cat:
-    def __init__(self, sprite_sheet_path, frame_count=7, scale=0.3, x = 640, y = 448):
+    def __init__(self, sprite_sheet_path, frame_count=7, scale=0.3, x=640, y=448):
         # Загружаем спрайт-лист
         self.sprite_sheet = pygame.image.load(sprite_sheet_path).convert_alpha()
         # Размер одного кадра
@@ -39,8 +38,8 @@ class Cat:
             self.current_frames = self.frames_left
 
             # Начальная позиция кота
-            #self.x = 1280 // 2 - self.scaled_width // 2
-            #self.y = 896 // 2 - self.scaled_height // 2
+            # self.x = 1280 // 2 - self.scaled_width // 2
+            # self.y = 896 // 2 - self.scaled_height // 2
             self.x = x
             self.y = y
 
@@ -63,7 +62,6 @@ class Cat:
 
             # Rect для коллизий
             self.rect = pygame.Rect(self.x, self.y, self.scaled_width, self.scaled_height)
-
 
     def update(self, keys):
         # Обработка движения
@@ -146,7 +144,6 @@ def ExecuteSQL(SQL_query):
     con = sqlite3.connect("films_db_.sqlite")
     cr = con.cursor()
 
-
     try:
         res = cr.execute(SQL_query).fetchall()
         if len(res) != 0:
@@ -168,28 +165,31 @@ def ExecuteSQL(SQL_query):
     finally:
         con.close()
 
-def DrawText(font, color, text: str, j = 0, x = 0):
+
+def DrawText(font, color, text: str, j=0, x=0):
     lines = text.split('\n')
     if x == 0:
         x_dest = 33
     else:
-        x_dest = 700*x
+        x_dest = 700 * x
     for i, line in enumerate(lines):
         consoleText = font.render(line, False, color)
-        screen.blit(consoleText, (x_dest, 33 + (j+i)*font.get_height()))
+        screen.blit(consoleText, (x_dest, 33 + (j + i) * font.get_height()))
+
 
 def DrawTextList(font, color, textList):
     for i, line in enumerate(textList):
         DrawText(font, color, line, i)
 
-def DrawDBText(font, color, result, roll = 0):
+
+def DrawDBText(font, color, result, roll=0):
     for i, line in enumerate(result):
-        s = ""
         for x, text in enumerate(line):
-            #s += text + "  "
-            i -= roll
+            if x == 0:
+                i -= roll
             if i <= 20 and i >= 0:
                 DrawText(font, color, str(text), i, x)
+
 
 pygame.init()
 
@@ -205,7 +205,6 @@ font = pygame.font.SysFont("couriernew", 24)
 
 overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
 overlay.fill((0, 0, 0, 200))
-
 
 running = True
 
@@ -228,43 +227,42 @@ while running:
     pc_rect = None
     combination_lock = None
     combination_lock_opened = False
+    color = (157, 164, 171)
 
     swithLoc = False
 
     if loc == 1:
         '''текстуры'''
-        pcTxtur = pygame.image.load("Texture\\PC_Sprite.png")
+        pcTxtur = pygame.image.load("Texture/PC_Sprite.png")
         pcTxtur = pygame.transform.scale_by(pcTxtur, 0.3)
         pcTxtur_dest = (505, 240)
 
-        location = pygame.image.load("Texture\\loction_lab1.png")
+        location = pygame.image.load("Texture/loction_lab1.png")
         location = pygame.transform.scale(location, (1280, 896))
 
-        button = pygame.image.load("Texture\\Button_Sprite.png")
+        button = pygame.image.load("Texture/Button_Sprite.png")
         button = pygame.transform.scale_by(button, 0.1)
         button_dest = (1211, 25)
         button_rect = button.get_rect(topleft=button_dest)
 
-
-        redButton = pygame.image.load("Texture\\RedButton_Sprite.png")
+        redButton = pygame.image.load("Texture/RedButton_Sprite.png")
         redButton = pygame.transform.scale_by(redButton, 0.1)
         redButton_dest = (1211, 60)
         redButton_rect = redButton.get_rect(topleft=redButton_dest)
 
+        cat = Cat("Texture/Cat_Sheet.png", frame_count=7, scale=0.3)
 
-        cat = Cat("Texture\\Cat_Sheet.png", frame_count=7, scale=0.3)
-
-        doorTriggerRect = pygame.Rect(1123, 537, 100, 100) #(964, 528)
+        doorTriggerRect = pygame.Rect(1123, 537, 100, 100)  # (964, 528)
         # Создаем Rect для монитора
         pc_rect = pcTxtur.get_rect(topleft=pcTxtur_dest)
 
     elif loc == 2:
-        location = pygame.image.load("Texture\\loction_lab2.png")
+        location = pygame.image.load("Texture/loction_lab2.png")
         location = pygame.transform.scale(location, (1280, 896))
-        cat = Cat("Texture\\Cat_Sheet.png", frame_count=7, scale=0.3, x=52, y=851)
+        cat = Cat("Texture/Cat_Sheet.png", frame_count=7, scale=0.3, x=52, y=851)
         doorTriggerRect = pygame.Rect(2939, 2457, 40, 100)
 
-        combination_lock = pygame.image.load("Texture\\Combination_Lock.png")   #(826, 210)
+        combination_lock = pygame.image.load("Texture/Combination_Lock_OFF.png")  # (826, 210)
         combination_lock = pygame.transform.scale_by(combination_lock, 0.1)
         combination_lock_dest = (800, 195)
         combination_lock_rect = combination_lock.get_rect(topleft=combination_lock_dest)
@@ -275,7 +273,6 @@ while running:
     # Масштабированная версия для полного экрана
     pc_fullscreen = None
     combination_lock_fullscreen = None
-
 
     """SELECT 
     	f.title, g.title 
@@ -315,10 +312,16 @@ while running:
                 screen.blit(button, button_dest)
                 screen.blit(redButton, redButton_dest)
                 # отрисовка текста
-                if len(SQL_result) == 0:  # Не робит!
-                    DrawText(font, (157, 164, 171), SQL_query)
-                elif DB_mod == True:
-                    DrawDBText(font, (157, 164, 171), SQL_result, roll)
+                if type(SQL_result) == list:
+                    if len(SQL_result) == 0:  # Не робит!
+                        DrawText(font, color, SQL_query)
+                    elif DB_mod == True:
+                        # print("draw err!!!!!!",SQL_result, type(SQL_result[0]))
+                        if type(SQL_result[0]) == str:
+                            DrawTextList(font, color, SQL_result)
+                        else:
+                            DrawDBText(font, color, SQL_result, roll)  # color (157, 164, 171)
+
 
         if combination_lock is not None:
             if not combination_lock_opened:
@@ -326,22 +329,18 @@ while running:
                 screen.blit(combination_lock, combination_lock_dest)
             else:
                 screen.blit(overlay, (0, 0))
-                screen.blit(combination_lock_fullscreen, (431, 235)) #(1280, 896)
-
-
-
+                screen.blit(combination_lock_fullscreen, (431, 235))  # (1280, 896)
 
         pygame.display.update()
 
         '''логика игры'''
 
-        #(1236, 620)
+        # (1236, 620)
 
         if doorTriggerRect.collidepoint(cat.x, cat.y):
             swithLoc = True
             loc = 2
             print("Yes")
-
 
         keys = pygame.key.get_pressed()
 
@@ -350,8 +349,8 @@ while running:
         for event in pygame.event.get():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                #swithLoc = True
-                #loc = 2
+                # swithLoc = True
+                # loc = 2
                 # кнопка
                 if loc == 1:
                     if button_rect.collidepoint(event.pos):
@@ -372,9 +371,6 @@ while running:
                         print("EEEEEEEEEEEEEEEEEEEEEEEEEEEE")
                         if combination_lock_opened:
                             combination_lock_fullscreen = pygame.transform.scale_by(combination_lock, 9)
-
-
-
 
                 print(f"Нажата кнопка: {event.button}")  # 1-левая, 3-правая, 2-средняя
                 print(f"Позиция: {event.pos}")  # (x, y)
